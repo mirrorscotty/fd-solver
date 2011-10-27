@@ -1,39 +1,6 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include "fd-solver.h"
-
-struct Node1D* CreateNode1D(double dx, int NumValues)
-{
-    struct Node1D *node;
-    static int id = 0;
-    node = (struct Node1D*) calloc(1, sizeof(struct Node1D));
-
-    node->nid = id;
-    id++;
-
-    node->Update = NULL;
-    node->dx = dx;
-    node->Type = SUBDOMAIN;
-    node->Next = NULL;
-    node->Prev = NULL;
-    node->NextIsDep = 0;
-    node->PrevIsDep = 0;
-    node->Value = NULL;
-    node->Value = (double*) calloc(NumValues, sizeof(double));
-    node->TimeIndex = 0;
-
-    return node;
-}
-
-void DestroyNode1D(struct Node1D *node)
-{
-    if(node) {
-        if(node->Value)
-            free(node->Value);
-        free(node);
-    }
-}
 
 struct Domain1D* CreateDomain1D(char *name,
         int width,
@@ -58,7 +25,7 @@ struct Domain1D* CreateDomain1D(char *name,
 
     domain->Nodes = (struct Node1D**) calloc(times, sizeof(struct Node1D*));
     for(i=0; i<width; i++) {
-        domain->Nodes[i] = CreateNode1D(dx, times);
+        domain->Nodes[i] = CreateNode1D(dx, dt, times);
         domain->Nodes[i]->Prev = PrevNode;
         if(PrevNode)
             PrevNode->Next = domain->Nodes[i];
@@ -84,23 +51,56 @@ void DestroyDomain1D(struct Domain1D *domain)
     }
 }
 
-int main(int argc, char *argv[])
+int UpdateDomain(struct Domain1D *domain)
 {
-    struct Domain1D *domain;
+    int i;
+    struct NodeStack *UpdateLater;
     struct Node1D *node;
 
-    fprintf(stdout, "BLAH!\n");
+    UpdateLater = NULL;
+
+    if(domain->TimeIndex == domain->NumTimes) {
+        return 1;
+    }
     
-    domain = CreateDomain1D("x", 5, .5, .1, 500);
-    
-    node = domain->Nodes[0];
-    while(node) {
-        fprintf(stdout, "%d -> %f\n", node->nid, node->Value[0]);
-        node = node->Next;
+    for(i = 0; i < domain->NumNodes; i++) {
+        if(UpdateNode(domain->Nodes[i]) == 1)
+            UpdateLater = Push(UpdateLater, domain->Nodes[i]);
     }
 
-    DestroyDomain1D(domain);
+    while(UpdateLater) {
+        node = UpdateLater->Node;
+        node->Update(node);
+        node->TimeIndex++;
+        UpdateLater = Pop(UpdateLater);
+    }
+
+    domain->TimeIndex++;
 
     return 0;
 }
 
+void DomainApplyInitialCondition(struct Domain1D *domain, double value)
+{
+    int i;
+    for(i = 0; i < domain->NumNodes; i++) {
+        NodeApplyInitialCondition(domain->Nodes[i], value);
+    }
+}
+
+struct NodeStack* Push(struct NodeStack *stack, struct Node1D *node)
+{
+    struct NodeStack *tmp;
+    tmp = (struct NodeStack*) calloc(1, sizeof(struct NodeStack));
+    stack->Node = node;
+    stack->Next = stack;
+    return tmp;
+}
+
+struct NodeStack* Pop(struct NodeStack *stack)
+{
+    struct NodeStack *tmp;
+    tmp = stack->Next;
+    free(stack);
+    return tmp;
+}
