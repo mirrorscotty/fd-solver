@@ -33,6 +33,17 @@ double UpdateSubdomain(struct Node1D *node)
     return T;
 }
 
+double UpdateSubdomainRxn(struct *Node1D *node)
+{
+    double k; /* Rate Constant */
+    int t = node->TimeIndex;
+    int dt = node->dt;
+
+    node->Value[t+1] = node->Value[t] * (1-k*dt);
+
+    return node->Value[t+1];
+}
+
 double UpdateConvectiveBoundary(struct Node1D *node)
 {
     double T, Text, Ta, Tb;
