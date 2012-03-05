@@ -7,7 +7,7 @@ struct Node1D {
     int nid;
     
     /* Update function */
-    double (*Update)(struct Node1D*);
+    double (**Update)(struct Node1D*, int);
 
     /* Node width */
     double dx;
@@ -32,8 +32,15 @@ struct Node1D {
     /* Same as above, only for the previous node */
     int PrevIsDep;
 
-    /* List of values by time index. First value is the initial value. */
-    double *Value;
+    /* List of values by time index. First value is the initial value. First
+     * index determines which variable the values are for. */
+    double **Value;
+
+    /* Names of each of the variables */
+    char *Vars;
+
+    int NumVars;
+    int NumValues;
 
     /* Current time index. */
     int TimeIndex;
@@ -64,20 +71,23 @@ struct NodeStack {
     struct NodeStack *Next;
 };
 
-struct Node1D* CreateNode1D(double, double, int);
+struct Node1D* CreateNode1D(double, double, int, int);
 void DestroyNode1D(struct Node1D*);
-struct Domain1D* CreateDomain1D(char*, int, double, double, int);
+struct Domain1D* CreateDomain1D(char*, int, double, double, int, int);
 void DestroyDomain1D(struct Domain1D*);
 
 int UpdateNode(struct Node1D*);
 int UpdateDomain(struct Domain1D*);
-void NodeApplyInitialCondition(struct Node1D*, double);
-void DomainApplyInitialCondition(struct Domain1D*, double);
+void NodeApplyInitialCondition(struct Node1D*, int, double);
+void DomainApplyInitialCondition(struct Domain1D*, int, double);
+void NodeSetUpdateFunction(struct Node1D*, int, char, double (*)(struct Node1D*, int));
+double NodeGetValue(struct Node1D*, char, int);
 struct NodeStack* Push(struct NodeStack*, struct Node1D*);
 struct NodeStack* Pop(struct NodeStack*);
 
-double UpdateTest(struct Node1D*);
-double UpdateSubdomain(struct Node1D*);
-double UpdateInsulatedBoundary(struct Node1D*);
-double UpdateConvectiveBoundary(struct Node1D*);
+double UpdateTest(struct Node1D*, int);
+double UpdateSubdomain(struct Node1D*, int);
+double UpdateInsulatedBoundary(struct Node1D*, int);
+double UpdateConvectiveBoundary(struct Node1D*, int);
+double UpdateSubdomainRxn(struct Node1D*, int);
 

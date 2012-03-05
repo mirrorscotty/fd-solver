@@ -6,6 +6,7 @@ struct Domain1D* CreateDomain1D(char *name,
         int width,
         double dx,
         double dt,
+        int NumVars,
         int times)
 {
     struct Domain1D *domain;
@@ -25,7 +26,7 @@ struct Domain1D* CreateDomain1D(char *name,
 
     domain->Nodes = (struct Node1D**) calloc(times, sizeof(struct Node1D*));
     for(i=0; i<width; i++) {
-        domain->Nodes[i] = CreateNode1D(dx, dt, times);
+        domain->Nodes[i] = CreateNode1D(dx, dt, NumVars, times);
         domain->Nodes[i]->Prev = PrevNode;
         if(PrevNode)
             PrevNode->Next = domain->Nodes[i];
@@ -59,7 +60,7 @@ int UpdateDomain(struct Domain1D *domain)
 
     UpdateLater = NULL;
 
-    if(domain->TimeIndex == domain->NumTimes) {
+    if(domain->TimeIndex+1 == domain->NumTimes) {
         return 1;
     }
     
@@ -70,7 +71,7 @@ int UpdateDomain(struct Domain1D *domain)
 
     while(UpdateLater) {
         node = UpdateLater->Node;
-        node->Update(node);
+        UpdateNode(node);
         node->TimeIndex++;
         UpdateLater = Pop(UpdateLater);
     }
@@ -80,11 +81,11 @@ int UpdateDomain(struct Domain1D *domain)
     return 0;
 }
 
-void DomainApplyInitialCondition(struct Domain1D *domain, double value)
+void DomainApplyInitialCondition(struct Domain1D *domain, int Var, double value)
 {
     int i;
     for(i = 0; i < domain->NumNodes; i++) {
-        NodeApplyInitialCondition(domain->Nodes[i], value);
+        NodeApplyInitialCondition(domain->Nodes[i], Var, value);
     }
 }
 
