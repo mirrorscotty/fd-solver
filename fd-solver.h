@@ -89,5 +89,6 @@ double UpdateTest(struct Node1D*, int);
 double UpdateSubdomain(struct Node1D*, int);
 double UpdateInsulatedBoundary(struct Node1D*, int);
 double UpdateConvectiveBoundary(struct Node1D*, int);
-double UpdateSubdomainRxn(struct Node1D*, int);
+double UpdateSubdomainRxn1(struct Node1D*, int);
+double UpdateSubdomainRxn2(struct Node1D*, int);
 
