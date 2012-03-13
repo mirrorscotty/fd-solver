@@ -32,17 +32,19 @@ int main(int argc, char *argv[])
 
     while(UpdateDomain(domain) != 1);
 
-    node = domain->Nodes[0];
+    node = domain->Nodes[3];
     //for(i = 0; i < node->TimeIndex; i++) {
     //    fprintf(stdout, "%3.0f, ", node->Value[0][i]);
     //}
     //fprintf(stdout, "\n\n");
-    while(node) {
+    //while(node) {
         //fprintf(stdout, "%d -> %f\n", node->nid, node->Value[0][3000]);
         
-        fprintf(stdout, "%d -> %f\n", node->nid, NodeGetValue(node, 'd', 100));
-        node = node->Next;
-    }
+        //fprintf(stdout, "%d -> %f\n", node->nid, NodeGetValue(node, 'd', 100));
+        //node = node->Next;
+    //}
+    //
+    CSVOutFixedTime(domain, 4000, "test.csv");
 
     DestroyDomain1D(domain);
 
