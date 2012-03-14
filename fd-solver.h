@@ -1,3 +1,10 @@
+#ifndef FD_SOLVER_H
+#define FD_SOLVER_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Relavent data structures to make the simulation work. */
 
 enum NodeType { BOUNDARY, SUBDOMAIN };
@@ -91,4 +98,13 @@ double UpdateInsulatedBoundary(struct Node1D*, int);
 double UpdateConvectiveBoundary(struct Node1D*, int);
 double UpdateSubdomainRxn1(struct Node1D*, int);
 double UpdateSubdomainRxn2(struct Node1D*, int);
+
+void CSVOutFixedNode(struct Node1D*, char*);
+void CSVOutFixedTime(struct Domain1D*, int, char*);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
 
