@@ -1,1 +1,4 @@
 Basic finite difference solver.
+
+Uses Qt4 for the GUI and Qwt6 for plotting.
+

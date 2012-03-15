@@ -25,19 +25,27 @@ Solver::Solver(QWidget *parent)
     connect(comboLeftBC, SIGNAL( currentIndexChanged(int) ), this, SLOT( changeLBC(int) ));
     connect(comboRightBC, SIGNAL( currentIndexChanged(int) ), this, SLOT( changeRBC(int) ));
 
+    // Set the domain and datalist variables to NULL. They're both initialized
+    // later in the program.
     domain = NULL;
     datalist = NULL;
 
+    // Since the default boundary condition in the program is "insulation,"
+    // none of the options need to be shown initially.
     leftBCHideAll();
     rightBCHideAll();
 
+    // Check one of the radio buttons for the graph
     radioTime->setChecked(true);
-        Temp = new QwtPlotCurve( "Temperature" );
-        Temp->setPen( QPen( Qt::red ) );
-        Prod = new QwtPlotCurve( "Product Concentration" );
-        Prod->setPen( QPen( Qt::blue ) );
-        Bact = new QwtPlotCurve( "Bacteria Concentration" );
-        Bact->setPen( QPen( Qt::green ) );
+
+    // Setup curves for each of the variables to plot. Also, make them
+    // different colors.
+    Temp = new QwtPlotCurve( "Temperature" );
+    Temp->setPen( QPen( Qt::red ) );
+    Prod = new QwtPlotCurve( "Product Concentration" );
+    Prod->setPen( QPen( Qt::blue ) );
+    Bact = new QwtPlotCurve( "Bacteria Concentration" );
+    Bact->setPen( QPen( Qt::green ) );
 }
 
 Solver::~Solver()
@@ -45,30 +53,32 @@ Solver::~Solver()
     return;
 }
 
-void Solver::solve()
-{
-    return;
-}
-
+// Close the window and exit the program.
 void Solver::quitApplication()
 {
     qApp->exit(0);
 }
 
+// When the user changes the boundary condition settings, show/hide options as
+// appropriate.
 void Solver::changeLBC(int index)
 {
+    // Hide everything to begin with.
     leftBCHideAll();
     switch(index) {
         case 1:
+            // Show just options for convection.
             leftBCShowConv();
             break;
         case 2:
+            // Show options for convection and heating/cooling.
             leftBCShowConvTime();
             break;
     }
     return;
 }
 
+// Same as above.
 void Solver::changeRBC(int index)
 {
     rightBCHideAll();
@@ -83,6 +93,7 @@ void Solver::changeRBC(int index)
     return;
 }
 
+// Function to hide all the widget associated with the left boundary condition.
 void Solver::leftBCHideAll()
 {
     lbch->hide();
@@ -98,6 +109,7 @@ void Solver::leftBCHideAll()
     return;
 }
 
+// Same for the right BC.
 void Solver::rightBCHideAll()
 {
     rbch->hide();
@@ -114,6 +126,7 @@ void Solver::rightBCHideAll()
     return;
 }
 
+// Show options associated with convection.
 void Solver::leftBCShowConv()
 {
     lbch->show();
@@ -133,6 +146,8 @@ void Solver::rightBCShowConv()
     return;
 }
 
+// Show options for convection where the external temperature can take on two
+// values.
 void Solver::rightBCShowConvTime()
 {
     rbch->show();
@@ -160,7 +175,10 @@ void Solver::leftBCShowConvTime()
     return;
 }
 
+// Macro to simplify the code for saving data from the gui to a linked list.
 #define GETVARIABLE( VARNAME, BOXNAME ) { tmp->name = #VARNAME; tmp->value = (BOXNAME)->value(); tmp->next = new_var(); tmp = tmp->next; }
+// Store all (most of) the data that the user has inputted in the gui in the
+// datalist variable.
 void Solver::storeVariables()
 {
     struct var *tmp;
@@ -196,7 +214,10 @@ void Solver::storeVariables()
     return;
 }
 
+// Simplify code for moving values from a linked list into the gui.
 #define RESTOREVAR( VARNAME, BOXNAME ) { if(strcmp(tmp->name, #VARNAME) == 0){(BOXNAME)->setValue(tmp->value);} }
+// Take all the data from the datalist variable and stick it into the
+// appropriate fields in the gui.
 void Solver::loadVars()
 {
     struct var *tmp;
@@ -225,20 +246,28 @@ void Solver::loadVars()
     return;
 }
 
+// Take the information about the domain from the appropriate fields in the gui
+// and initialize the "domain" variable. Three dependant variables are solved
+// for: Temperature, product concentration, and bacteria concentration.
 void Solver::setupDomain()
 {
     struct Node1D *node;
+
+    // Load the required parameters
     int NNodes = spinNodes->value();
     double Deltax = spinWidth->value()/NNodes;
     double Deltat = spinDt->value();
     int NTimeSteps = (int) (spintEnd->value()/Deltat);
 
+    // Set up the domain variable.
     domain = CreateDomain1D("x", NNodes, Deltax, Deltat, 3, NTimeSteps);
 
+    // Apply the appropriate initial conditions.
     DomainApplyInitialCondition(domain, 0, spinTInit->value());
     DomainApplyInitialCondition(domain, 1, spinC1Init->value());
     DomainApplyInitialCondition(domain, 2, spinC2Init->value());
 
+    // Define the update functions for each variable at all the nodes.
     node = domain->Nodes[0];
     while(node) {
         NodeSetUpdateFunction(node, 0, 'T', &UpdateSubdomain);
@@ -247,12 +276,10 @@ void Solver::setupDomain()
         node = node->Next;
     }
 
+    // Apply the boundary conditions. Currently, these are hardcoded, but they
+    // should be configurable from the gui.
     NodeSetUpdateFunction(domain->Nodes[0], 0, 'T', &UpdateInsulatedBoundary);
     NodeSetUpdateFunction(domain->Nodes[NNodes-1], 0, 'T', &UpdateConvectiveBoundary);
-
-    printf("Step Size: %g\n", Deltat);
-    printf("End Time: %g\n", spintEnd->value());
-    printf("Time Steps: %d\n", NTimeSteps);
 
     return;
 }
@@ -260,23 +287,35 @@ void Solver::setupDomain()
 void Solver::solveProblems()
 {
     struct var *tmp;
+    
+    // Set all the global variables to 0 so that things don't break hs orribly
+    // if everything wasn't defined.
     initialize_variables();
-    //init("can_data.dat");
+
+    // Set the datalist to NULL since we don't want to deal with old values.
+    // This is a horrible idea, and the old data should be cleaned up instead.
     datalist = NULL;
+
     storeVariables();
+
+    // Save the data to the global variables used by the material property
+    // funcitons. (Also bad.)
     tmp = datalist;
     while(tmp) {
         store_data(tmp);
         tmp = tmp->next;
     }
 
+    // Initialize the domain
     setupDomain();
 
     // Solve
     while(UpdateDomain(domain) != 1);
 
+    // Plot the data for node 0. This should be configureable, but isn't.
     plotResultsTime(domain->Nodes[0]);
 
+    // Clean up.
     DestroyDomain1D(domain);
 }
 
@@ -308,6 +347,7 @@ void Solver::plotResultsTime(struct Node1D* n)
 }
 */
 
+// Function to plot results at a single node as a function of time.
 void Solver::plotResultsTime(struct Node1D *n)
 {
     int i;
@@ -320,19 +360,28 @@ void Solver::plotResultsTime(struct Node1D *n)
         t[i] = i*n->dt;
     }
 
+    // Detach the curves from the plot so that they don't show up. If we want
+    // them to show up, we'll reattach them later.
     Temp->detach();
     Prod->detach();
     Bact->detach();
 
+    // Plot temperature data if the box for it is checked.
     if(checkTemp->isChecked()) {
         T = (double*) calloc(npts, sizeof(double));
+        // Get the values from the solution.
         for(i=0; i<npts; i++) {
             T[i] = n->Value[0][i];
         }
 
+        // Save the data to the curve. This makes a copy of the data, so we can
+        // delete the two arrays later.
+        Temp->setSamples(t, T, npts);
+
+        // Put the curve on the graph.
         Temp->attach(qwtPlot);
 
-        Temp->setSamples(t, T, npts);
+        // Delete the temperature data we retrieved.
         free(T);
     }
 
@@ -360,9 +409,14 @@ void Solver::plotResultsTime(struct Node1D *n)
         free(d);
     }
 
+    // Update the graph to show what we just did.
     qwtPlot->replot();
+
+    // Get rid of the "t" array. We don't want it anymore.
+    free(t);
 }
 
+// Load all the simulation data from a text file.
 void Solver::loadSimulation()
 {
     struct var *tmp;
@@ -383,24 +437,32 @@ void Solver::loadSimulation()
 
     // Convert the filename to a char*
     ba = path.toLocal8Bit();
-
+    
+    // Read the data file into a buffer.
     buffer = read_datafile(ba.data());
 
+    // Parse the file line by line. (Hopefully there's not more than 200 lines.)
     for(i=0; i<200; i++) {
+        // Strip any comments that might be lurking in the file.
         buffer[i] = remove_comments(buffer[i]);
+        // Parse the line and save it to a variable.
         tmp = read_line(buffer[i]);
+        // If the variable actually contained something, save it. Otherwise just
+        // keep going and pretend like it never existed.
+        // TODO: Fix the memory leak.
         if(strcmp(tmp->name, "NULL") != 0)
             datalist = push_var(datalist, tmp);
     }
 
+    // Clean up the buffer.
     delete_buffer(buffer);
 
-    printf("something: %s: %g\n", datalist->next->name, datalist->next->value);
-
+    // Load the variables into the interface.
     loadVars();
     return;
 }
 
+// Save everything the user was working on to a file.
 void Solver::saveSimulation()
 {
     struct var *tmp;
@@ -421,22 +483,27 @@ void Solver::saveSimulation()
     // Convert the filename to a char*
     ba = path.toLocal8Bit();
 
+    // Open up the requested file.
     fp = fopen( (char*) ba.data(), "w+" );
+    // Check for errors in opening the file.
+    // TODO: Pop up an error message instead of printing stuff to the console.
     if(!fp) {
         fprintf(stderr, "Failed to open file for writing.");
         return;
     }
 
-    while(tmp) {
-        fprintf(fp, "%s = %g\n", tmp->name, tmp->value);
-        tmp = tmp->next;
-    }
+    //while(tmp) {
+    //    fprintf(fp, "%s = %g\n", tmp->name, tmp->value);
+    //    tmp = tmp->next;
+    //}
 
+    // Close the file.
     fclose(fp);
 
     return;
 }
 
+// Bring up an about dialog.
 void Solver::about()
 {
     QMessageBox::about(this, "About", "Simple finite difference solver.\n");

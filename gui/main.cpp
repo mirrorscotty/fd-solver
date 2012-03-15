@@ -2,6 +2,7 @@
 
 #include "solver.h"
 
+// Main loop for the gui.
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
