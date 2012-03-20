@@ -25,6 +25,10 @@ Solver::Solver(QWidget *parent)
     connect(comboLeftBC, SIGNAL( currentIndexChanged(int) ), this, SLOT( changeLBC(int) ));
     connect(comboRightBC, SIGNAL( currentIndexChanged(int) ), this, SLOT( changeRBC(int) ));
 
+    connect(spinNodes, SIGNAL( valueChanged(int) ), this, SLOT( setMaxNode(int) ));
+    connect(spinDt, SIGNAL( valueChanged(double) ), this, SLOT(setMaxTIndex(double) ));
+    connect(spintEnd, SIGNAL( valueChanged(double) ), this, SLOT(setMaxTIndex(double) ));
+
     // Set the domain and datalist variables to NULL. They're both initialized
     // later in the program.
     domain = NULL;
@@ -57,6 +61,18 @@ Solver::~Solver()
 void Solver::quitApplication()
 {
     qApp->exit(0);
+}
+
+// Set the maximum value for the spin box that allows the user to select the
+// node to plot data for.
+void Solver::setMaxNode(int i) {
+    spinPlotNode->setMaximum(i-1);
+    return;
+}
+
+void Solver::setMaxTIndex(double i) {
+    spinPlotTIndex->setMaximum((int) spintEnd->value()/spinDt->value()-1);
+    return;
 }
 
 // When the user changes the boundary condition settings, show/hide options as
@@ -287,9 +303,11 @@ void Solver::setupDomain()
 void Solver::solveProblems()
 {
     struct var *tmp;
+    int nodenum = 0; // Node to use to plot stuff
+    int timeindex = 0;
     
     // Set all the global variables to 0 so that things don't break hs orribly
-    // if everything wasn't defined.
+    //  if everything wasn't defined.
     initialize_variables();
 
     // Set the datalist to NULL since we don't want to deal with old values.
@@ -313,7 +331,13 @@ void Solver::solveProblems()
     while(UpdateDomain(domain) != 1);
 
     // Plot the data for node 0. This should be configureable, but isn't.
-    plotResultsTime(domain->Nodes[0]);
+    if(!radioTime->isChecked()) {
+        nodenum = spinPlotNode->value();
+        plotResultsTime(domain->Nodes[nodenum]);
+    } else {
+        timeindex = spinPlotTIndex->value();
+        plotResultsSpace(timeindex);
+    }
 
     // Clean up.
     DestroyDomain1D(domain);
@@ -416,6 +440,74 @@ void Solver::plotResultsTime(struct Node1D *n)
     free(t);
 }
 
+// Plot the results at a fixed time as a function of the spatial coordinate.
+void Solver::plotResultsSpace(int t)
+{
+    int i;
+    int npts = domain->NumNodes;
+    double *x, *T, *c, *d;
+    
+    /* Create an array with the x values. */
+    x = (double*) calloc(npts, sizeof(double));
+    for(i=0; i<npts; i++) {
+        x[i] = i*domain->Nodes[i]->dx;
+    }
+
+    // Detach the curves from the plot so that they don't show up. If we want
+    // them to show up, we'll reattach them later.
+    Temp->detach();
+    Prod->detach();
+    Bact->detach();
+
+    // Plot temperature data if the box for it is checked.
+    if(checkTemp->isChecked()) {
+        T = (double*) calloc(npts, sizeof(double));
+        // Get the values from the solution.
+        for(i=0; i<npts; i++) {
+            T[i] = domain->Nodes[i]->Value[0][t];
+        }
+
+        // Save the data to the curve. This makes a copy of the data, so we can
+        // delete the two arrays later.
+        Temp->setSamples(x, T, npts);
+
+        // Put the curve on the graph.
+        Temp->attach(qwtPlot);
+
+        // Delete the temperature data we retrieved.
+        free(T);
+    }
+
+    if(checkProduct->isChecked()) {
+        c = (double*) calloc(npts, sizeof(double));
+        for(i=0; i<npts; i++) {
+            c[i] = domain->Nodes[i]->Value[1][t];
+        }
+
+        Prod->attach(qwtPlot);
+
+        Prod->setSamples(x, c, npts);
+        free(c);
+    }
+
+    if(checkBact->isChecked()) {
+        d = (double*) calloc(npts, sizeof(double));
+        for(i=0; i<npts; i++) {
+            d[i] = domain->Nodes[i]->Value[2][t];
+        }
+
+        Bact->attach(qwtPlot);
+
+        Bact->setSamples(x, d, npts);
+        free(d);
+    }
+
+    // Update the graph to show what we just did.
+    qwtPlot->replot();
+
+    // Get rid of the "x" array. We don't want it anymore.
+    free(x);
+}
 // Load all the simulation data from a text file.
 void Solver::loadSimulation()
 {

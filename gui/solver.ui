@@ -42,7 +42,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="DomainTab">
        <property name="geometry">
@@ -50,7 +50,7 @@
          <x>0</x>
          <y>0</y>
          <width>340</width>
-         <height>479</height>
+         <height>486</height>
         </rect>
        </property>
        <attribute name="label">
@@ -192,7 +192,7 @@ p, li { white-space: pre-wrap; }
          <x>0</x>
          <y>0</y>
          <width>340</width>
-         <height>479</height>
+         <height>486</height>
         </rect>
        </property>
        <attribute name="label">
@@ -388,8 +388,8 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>323</width>
-         <height>496</height>
+         <width>340</width>
+         <height>477</height>
         </rect>
        </property>
        <attribute name="label">
@@ -732,7 +732,7 @@ p, li { white-space: pre-wrap; }
          <x>0</x>
          <y>0</y>
          <width>340</width>
-         <height>479</height>
+         <height>486</height>
         </rect>
        </property>
        <attribute name="label">
@@ -838,7 +838,7 @@ p, li { white-space: pre-wrap; }
          <x>0</x>
          <y>0</y>
          <width>340</width>
-         <height>479</height>
+         <height>486</height>
         </rect>
        </property>
        <attribute name="label">
@@ -991,18 +991,46 @@ p, li { white-space: pre-wrap; }
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <widget class="QRadioButton" name="radioTime">
-             <property name="text">
-              <string>Time</string>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_34">
+             <item>
+              <widget class="QRadioButton" name="radioTime">
+               <property name="text">
+                <string>Time</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_9">
+               <property name="text">
+                <string>(Time Index)</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="spinPlotTIndex"/>
+             </item>
+            </layout>
            </item>
            <item>
-            <widget class="QRadioButton" name="radioLength">
-             <property name="text">
-              <string>Length</string>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_35">
+             <item>
+              <widget class="QRadioButton" name="radioLength">
+               <property name="text">
+                <string>Length</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_10">
+               <property name="text">
+                <string>(Node Number)</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="spinPlotNode"/>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -1037,7 +1065,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>826</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

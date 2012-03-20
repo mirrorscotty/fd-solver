@@ -13,7 +13,7 @@ class Solver : public QMainWindow, private Ui::SolverWindow
         ~Solver();
         
     public slots:
-        void solve();
+//        void solve();
         void quitApplication();
         void loadSimulation();
         void saveSimulation();
@@ -21,6 +21,9 @@ class Solver : public QMainWindow, private Ui::SolverWindow
 
         void changeLBC(int);
         void changeRBC(int);
+
+        void setMaxNode(int);
+        void setMaxTIndex(double);
 
         void solveProblems();
 
@@ -41,6 +44,7 @@ class Solver : public QMainWindow, private Ui::SolverWindow
 
         void setupDomain();
         void plotResultsTime(struct Node1D*);
+        void plotResultsSpace(int);
 };
 
 #endif
