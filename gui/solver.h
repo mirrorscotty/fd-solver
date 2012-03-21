@@ -18,6 +18,7 @@ class Solver : public QMainWindow, private Ui::SolverWindow
         void loadSimulation();
         void saveSimulation();
         void about();
+        void saveCSV();
 
         void changeLBC(int);
         void changeRBC(int);

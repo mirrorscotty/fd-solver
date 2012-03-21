@@ -18,10 +18,13 @@ Solver::Solver(QWidget *parent)
 
     // Connect all the relevant signals
     connect(buttonSolve, SIGNAL( clicked() ), this, SLOT( solveProblems() ));
+
     connect(actionQuit, SIGNAL( triggered() ), this, SLOT( quitApplication() ));
     connect(actionSave_Simulation, SIGNAL( triggered() ), this, SLOT( saveSimulation() ));
     connect(actionOpen, SIGNAL( triggered() ), this, SLOT( loadSimulation() ));
     connect(actionAbout, SIGNAL( triggered() ), this, SLOT( about() ));
+    connect(actionSave_CSV, SIGNAL( triggered() ), this, SLOT( saveCSV() ));
+
     connect(comboLeftBC, SIGNAL( currentIndexChanged(int) ), this, SLOT( changeLBC(int) ));
     connect(comboRightBC, SIGNAL( currentIndexChanged(int) ), this, SLOT( changeRBC(int) ));
 
@@ -54,6 +57,7 @@ Solver::Solver(QWidget *parent)
 
 Solver::~Solver()
 {
+    DestroyDomain1D(domain);
     return;
 }
 
@@ -324,6 +328,8 @@ void Solver::solveProblems()
         tmp = tmp->next;
     }
 
+    // Clean up stuff that was there before.
+    DestroyDomain1D(domain);
     // Initialize the domain
     setupDomain();
 
@@ -338,9 +344,6 @@ void Solver::solveProblems()
         timeindex = spinPlotTIndex->value();
         plotResultsSpace(timeindex);
     }
-
-    // Clean up.
-    DestroyDomain1D(domain);
 }
 
 /* Example, since the Qwt docs are terrible
@@ -594,6 +597,38 @@ void Solver::saveSimulation()
 
     return;
 }
+
+void Solver::saveCSV()
+{
+    QString path;
+    QByteArray ba;
+
+    // Check to see if the user has run the simulation before trying to save
+    // the output. Stops the program from seg faulting.
+    if(!domain) {
+        QMessageBox::warning(this, "Error", "Please run the simulation before saving the results.");
+        return;
+    }
+
+    // Get the filename to save to.
+    path = QFileDialog::getSaveFileName(
+            this,
+            "Save As",
+            QString::null,
+            QString::null);
+
+    // Convert the filename to a char*
+    ba = path.toLocal8Bit();
+
+    if(radioTime->isChecked()) {
+        CSVOutFixedTime(domain, spinPlotTIndex->value(), ba.data());
+    } else {
+        CSVOutFixedNode(domain->Nodes[spinPlotNode->value()], ba.data());
+    }
+    return;
+}
+        
+
 
 // Bring up an about dialog.
 void Solver::about()
