@@ -28,6 +28,7 @@ struct Domain1D* CreateDomain1D(char *name,
     for(i=0; i<width; i++) {
         domain->Nodes[i] = CreateNode1D(dx, dt, NumVars, times);
         domain->Nodes[i]->Prev = PrevNode;
+        domain->Nodes[i]->NodeNum = i;
         if(PrevNode)
             PrevNode->Next = domain->Nodes[i];
         PrevNode = domain->Nodes[i];

@@ -290,7 +290,7 @@ void Solver::setupDomain()
     // Define the update functions for each variable at all the nodes.
     node = domain->Nodes[0];
     while(node) {
-        NodeSetUpdateFunction(node, 0, 'T', &UpdateSubdomain);
+        NodeSetUpdateFunction(node, 0, 'T', &UpdateSubdomainCyl);
         NodeSetUpdateFunction(node, 1, 'c', &UpdateSubdomainRxn1);
         NodeSetUpdateFunction(node, 2, 'd', &UpdateSubdomainRxn2);
         node = node->Next;
@@ -298,8 +298,8 @@ void Solver::setupDomain()
 
     // Apply the boundary conditions. Currently, these are hardcoded, but they
     // should be configurable from the gui.
-    NodeSetUpdateFunction(domain->Nodes[0], 0, 'T', &UpdateInsulatedBoundary);
-    NodeSetUpdateFunction(domain->Nodes[NNodes-1], 0, 'T', &UpdateConvectiveBoundary);
+    NodeSetUpdateFunction(domain->Nodes[0], 0, 'T', &UpdateRadialSymmetryBoundary);
+    NodeSetUpdateFunction(domain->Nodes[NNodes-1], 0, 'T', &UpdateConvectiveBoundaryCyl);
 
     return;
 }
@@ -334,7 +334,8 @@ void Solver::solveProblems()
     setupDomain();
 
     // Solve
-    while(UpdateDomain(domain) != 1);
+    while(UpdateDomain(domain) != 1)
+        progressBar->setValue( (int) domain->TimeIndex/domain->NumTimes * 100);
 
     // Plot the data for node 0. This should be configureable, but isn't.
     if(!radioTime->isChecked()) {
@@ -380,6 +381,8 @@ void Solver::plotResultsTime(struct Node1D *n)
     int i;
     int npts = n->NumValues;
     double *t, *T, *c, *d;
+    char *title;
+    title = (char*) calloc(20, sizeof(char));
     
     /* Create an array with the time values. */
     t = (double*) calloc(npts, sizeof(double));
@@ -436,6 +439,13 @@ void Solver::plotResultsTime(struct Node1D *n)
         free(d);
     }
 
+    sprintf(title, "x = %g", n->dx*n->NodeNum);
+    qwtPlot->setTitle(title);
+    free(title);
+
+    // Set the axis title. 2 corresponds to the lower x axis.
+    qwtPlot->setAxisTitle(2, "Time (sec)");
+
     // Update the graph to show what we just did.
     qwtPlot->replot();
 
@@ -449,6 +459,8 @@ void Solver::plotResultsSpace(int t)
     int i;
     int npts = domain->NumNodes;
     double *x, *T, *c, *d;
+    char *title;
+    title = (char*) calloc(20, sizeof(char));
     
     /* Create an array with the x values. */
     x = (double*) calloc(npts, sizeof(double));
@@ -504,6 +516,14 @@ void Solver::plotResultsSpace(int t)
         Bact->setSamples(x, d, npts);
         free(d);
     }
+
+    // Set the title.
+    sprintf(title, "t = %g", t*domain->dt);
+    qwtPlot->setTitle(title);
+    free(title);
+
+    // Set the axis title. 2 corresponds to the lower x axis.
+    qwtPlot->setAxisTitle(2, "Radius (m)");
 
     // Update the graph to show what we just did.
     qwtPlot->replot();

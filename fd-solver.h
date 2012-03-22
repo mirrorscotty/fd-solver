@@ -16,6 +16,9 @@ struct Node1D {
     /* Update function */
     double (**Update)(struct Node1D*, int);
 
+    /* Node index in the domain (center = 0) */
+    int NodeNum;
+
     /* Node width */
     double dx;
 
@@ -94,8 +97,11 @@ struct NodeStack* Pop(struct NodeStack*);
 
 double UpdateTest(struct Node1D*, int);
 double UpdateSubdomain(struct Node1D*, int);
+double UpdateSubdomainCyl(struct Node1D*, int);
 double UpdateInsulatedBoundary(struct Node1D*, int);
 double UpdateConvectiveBoundary(struct Node1D*, int);
+double UpdateRadialSymmetryBoundary(struct Node1D*, int);
+double UpdateConvectiveBoundaryCyl(struct Node1D*, int);
 double UpdateSubdomainRxn1(struct Node1D*, int);
 double UpdateSubdomainRxn2(struct Node1D*, int);
 

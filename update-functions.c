@@ -4,9 +4,9 @@
 
 double UpdateTest(struct Node1D *node, int Var)
 {
-    int t = node->TimeIndex;
+    int t = Var; // Get rid of the annoying warning about not using "Var"
+    t = node->TimeIndex;
     /* t is t */
-//    node->Value[t] = t;
     return (double) t;
 }
 
@@ -31,8 +31,32 @@ double UpdateSubdomain(struct Node1D *node, int Var)
     M = (node->dx)*(node->dx)/(alpha*node->dt);
 
     T = 1/M * (Ta + (M-2)*Tb + Tc);
-//    node->Value[t+1] = T;
     
+    return T;
+}
+
+/* Heat conduction in a cylinder */
+double UpdateSubdomainCyl(struct Node1D *node, int Var)
+{
+    double T, Ta, Tb, Tc;
+    int t = node->TimeIndex;
+    double n = node->NodeNum; // Node number where n=0 at the center
+    double Cond, Dens, Cap, alpha, M;
+
+    Ta = node->Prev->Value[Var][t];
+    Tb = node->Value[Var][t];
+    Tc = node->Next->Value[Var][t];
+
+    /* Calculate the thermal properties based on the temperature of the node at
+    the pervious time step. */
+    Cond = k(Tb); //0.5985; // W/(m K)
+    Dens = rho(Tb); //1000; // kg/m^3
+    Cap = Cp(Tb); //1865; // J/(kg K)
+
+    alpha = Cond/(Dens*Cap);
+    M = (node->dx)*(node->dx)/(alpha*node->dt);
+
+    T = 1/M * ( (2*n+1)/(2*n) * Tc + (M-2) * Tb + (2*n-1)/(2*n) * Ta );
     return T;
 }
 
@@ -92,7 +116,6 @@ double UpdateConvectiveBoundary(struct Node1D *node, int Var)
 
     T = 1/M * (2*N*Text + (M-(2*N+2))*Tb + 2*Ta);
 
-//    node->Value[t+1] = T;
     return T;
 }
 
@@ -116,7 +139,62 @@ double UpdateInsulatedBoundary(struct Node1D *node, int Var)
     M = (node->dx)*(node->dx)/(alpha*node->dt);
 
     T = 1/M * ((M-2)*Tb + 2*Ta);
-//    node->Value[t+1] = T;
+
+    return T;
+}
+
+double UpdateRadialSymmetryBoundary(struct Node1D *node, int Var)
+{
+    int t = node->TimeIndex;
+    double Ta, Tb, T, Cond, Dens, Cap, alpha, M;
+
+    Tb = node->Value[Var][t];
+
+    if(node->Next == NULL)
+        Ta = node->Prev->Value[Var][t];
+    else
+        Ta = node->Next->Value[Var][t];
+
+    /* Calculate the thermal properties based on the temperature of the node at
+    the pervious time step. */
+    Cond = k(Tb); //0.5985; // W/(m K)
+    Dens = rho(Tb); //1000; // kg/m^3
+    Cap = Cp(Tb); //1865; // J/(kg K)
+
+    alpha = Cond/(Dens*Cap);
+    M = (node->dx)*(node->dx)/(alpha*node->dt);
+
+    T = 4/M * Ta + (M-4)/M * Tb;
+
+    return T;
+}
+
+double UpdateConvectiveBoundaryCyl(struct Node1D *node, int Var)
+{
+    double T, Text, Ta, Tb;
+    int t = node->TimeIndex;
+    int n = node->NodeNum;
+    double Cond, Dens, Cap, alpha, M, N, h;
+
+    Tb = node->Value[Var][t];
+    Text = T_ext(t*node->dt);
+
+    /* Figure out which side the boundary is on */
+    if(node->Next == NULL)
+        Ta = node->Prev->Value[Var][t];
+    else
+        Ta = node->Next->Value[Var][t];
+
+    h = 3000; //W/(m^2 K)
+    Cond = k(Tb); //0.5985; // W/(m K)
+    Dens = rho(Tb); //1000; // kg/m^3
+    Cap = Cp(Tb); //1865; // J/(kg K)
+
+    alpha = Cond/(Dens*Cap);
+    M = (node->dx)*(node->dx)/(alpha*node->dt);
+    N = h*node->dx/Cond;
+
+    T = n*N/((2*n-1)/2 + n*N) * Text + (2*n-1)/2/((2*n-1)/2 + n*N) * Ta;
 
     return T;
 }

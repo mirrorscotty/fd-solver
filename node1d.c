@@ -30,6 +30,7 @@ struct Node1D* CreateNode1D(double dx, double dt, int NumVars, int NumValues)
     node->Vars = (char*) calloc(NumVars, sizeof(char));
     node->NumVars = NumVars;
     node->NumValues = NumValues;
+    node->NodeNum = 0;
 
     node->TimeIndex = 0;
 
