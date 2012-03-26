@@ -42,7 +42,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="DomainTab">
        <property name="geometry">
@@ -50,7 +50,7 @@
          <x>0</x>
          <y>0</y>
          <width>340</width>
-         <height>486</height>
+         <height>493</height>
         </rect>
        </property>
        <attribute name="label">
@@ -104,6 +104,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinWidth">
+            <property name="suffix">
+             <string> m</string>
+            </property>
             <property name="minimum">
              <double>0.100000000000000</double>
             </property>
@@ -140,6 +143,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinDt">
+            <property name="suffix">
+             <string> sec</string>
+            </property>
             <property name="decimals">
              <number>4</number>
             </property>
@@ -161,6 +167,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spintEnd">
+            <property name="suffix">
+             <string> sec</string>
+            </property>
             <property name="minimum">
              <double>0.100000000000000</double>
             </property>
@@ -192,7 +201,7 @@ p, li { white-space: pre-wrap; }
          <x>0</x>
          <y>0</y>
          <width>340</width>
-         <height>486</height>
+         <height>493</height>
         </rect>
        </property>
        <attribute name="label">
@@ -389,7 +398,7 @@ p, li { white-space: pre-wrap; }
          <x>0</x>
          <y>0</y>
          <width>340</width>
-         <height>477</height>
+         <height>493</height>
         </rect>
        </property>
        <attribute name="label">
@@ -425,6 +434,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinTInit">
+            <property name="suffix">
+             <string> K</string>
+            </property>
             <property name="maximum">
              <double>9999.989999999999782</double>
             </property>
@@ -494,6 +506,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinHLeft">
+            <property name="suffix">
+             <string> W/(m^2 K)</string>
+            </property>
             <property name="maximum">
              <double>999.990000000000009</double>
             </property>
@@ -512,6 +527,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinTExtLeft">
+            <property name="suffix">
+             <string> K</string>
+            </property>
             <property name="maximum">
              <double>9999.989999999999782</double>
             </property>
@@ -530,6 +548,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinTExtHotLeft">
+            <property name="suffix">
+             <string> K</string>
+            </property>
             <property name="maximum">
              <double>9999.989999999999782</double>
             </property>
@@ -548,6 +569,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinTExtColdLeft">
+            <property name="suffix">
+             <string> K</string>
+            </property>
             <property name="maximum">
              <double>9999.989999999999782</double>
             </property>
@@ -566,6 +590,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinTHeatLeft">
+            <property name="suffix">
+             <string> sec</string>
+            </property>
             <property name="maximum">
              <double>999999.989999999990687</double>
             </property>
@@ -632,6 +659,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinHRight">
+            <property name="suffix">
+             <string> W/(m^2 K)</string>
+            </property>
             <property name="maximum">
              <double>9999.989999999999782</double>
             </property>
@@ -650,6 +680,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinTExtRight">
+            <property name="suffix">
+             <string> K</string>
+            </property>
             <property name="maximum">
              <double>9999.989999999999782</double>
             </property>
@@ -668,6 +701,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinTExtHotRight">
+            <property name="suffix">
+             <string> K</string>
+            </property>
             <property name="maximum">
              <double>9999.989999999999782</double>
             </property>
@@ -686,6 +722,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinTExtColdRight">
+            <property name="suffix">
+             <string> K</string>
+            </property>
             <property name="maximum">
              <double>9999.989999999999782</double>
             </property>
@@ -704,6 +743,9 @@ p, li { white-space: pre-wrap; }
           </item>
           <item>
            <widget class="QDoubleSpinBox" name="spinTHeatRight">
+            <property name="suffix">
+             <string> sec</string>
+            </property>
             <property name="maximum">
              <double>999999.989999999990687</double>
             </property>
@@ -732,7 +774,7 @@ p, li { white-space: pre-wrap; }
          <x>0</x>
          <y>0</y>
          <width>340</width>
-         <height>486</height>
+         <height>493</height>
         </rect>
        </property>
        <attribute name="label">
@@ -767,7 +809,11 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="spinC1Init"/>
+           <widget class="QDoubleSpinBox" name="spinC1Init">
+            <property name="suffix">
+             <string> mol/L</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -799,7 +845,11 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="spinA1"/>
+           <widget class="QDoubleSpinBox" name="spinA1">
+            <property name="suffix">
+             <string> sec^-1</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -813,7 +863,14 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="spinEa1"/>
+           <widget class="QDoubleSpinBox" name="spinEa1">
+            <property name="suffix">
+             <string> J/mol</string>
+            </property>
+            <property name="maximum">
+             <double>9999999.990000000223517</double>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -838,7 +895,7 @@ p, li { white-space: pre-wrap; }
          <x>0</x>
          <y>0</y>
          <width>340</width>
-         <height>486</height>
+         <height>493</height>
         </rect>
        </property>
        <attribute name="label">
@@ -873,7 +930,14 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="spinC2Init"/>
+           <widget class="QDoubleSpinBox" name="spinC2Init">
+            <property name="prefix">
+             <string/>
+            </property>
+            <property name="suffix">
+             <string> mol/L</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -905,7 +969,11 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="spinA2"/>
+           <widget class="QDoubleSpinBox" name="spinA2">
+            <property name="suffix">
+             <string> sec^-1</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -919,7 +987,14 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QDoubleSpinBox" name="spinEa2"/>
+           <widget class="QDoubleSpinBox" name="spinEa2">
+            <property name="suffix">
+             <string> J/mol</string>
+            </property>
+            <property name="maximum">
+             <double>9999999.990000000223517</double>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
@@ -964,6 +1039,19 @@ p, li { white-space: pre-wrap; }
             <widget class="QCheckBox" name="checkTemp">
              <property name="text">
               <string>Temperature</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkk">
+             <property name="accessibleDescription">
+              <string/>
+             </property>
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
+             </property>
+             <property name="text">
+              <string>Thermal Diffusivity</string>
              </property>
             </widget>
            </item>
@@ -1065,7 +1153,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>826</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

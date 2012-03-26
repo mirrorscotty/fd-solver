@@ -31,7 +31,7 @@ class Solver : public QMainWindow, private Ui::SolverWindow
     private:
         struct Domain1D *domain;
         struct var *datalist;
-        QwtPlotCurve *Temp, *Prod, *Bact;
+        QwtPlotCurve *Temp, *Prod, *Bact, *alpha;
 
         void leftBCHideAll();
         void rightBCHideAll();

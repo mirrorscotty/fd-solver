@@ -12,6 +12,8 @@
 #include "datafile.h"
 #include "can.h"
 
+extern double R;
+
 Solver::Solver(QWidget *parent)
 {
     setupUi(this); // Initialize the user interface
@@ -53,11 +55,24 @@ Solver::Solver(QWidget *parent)
     Prod->setPen( QPen( Qt::blue ) );
     Bact = new QwtPlotCurve( "Bacteria Concentration" );
     Bact->setPen( QPen( Qt::green ) );
+    alpha = new QwtPlotCurve("Thermal Diffusivity");
+    alpha->setPen( QPen( Qt::magenta ) );
+
+    // Initialize the GUI
+    comboLeftBC->setCurrentIndex(0);
+    comboLeftBC->setEnabled(false);
+    comboRightBC->setCurrentIndex(2);
+    comboRightBC->setEnabled(false);
 }
 
 Solver::~Solver()
 {
     DestroyDomain1D(domain);
+    delete Temp;
+    delete Prod;
+    delete Bact;
+    delete alpha;
+
     return;
 }
 
@@ -222,6 +237,9 @@ void Solver::storeVariables()
     GETVARIABLE(NNodes, spinNodes)
     GETVARIABLE(Deltat, spinDt)
     GETVARIABLE(t_heat, spinTHeatRight)
+    GETVARIABLE(HConv, spinHRight)
+    GETVARIABLE(CAinit, spinC1Init)
+    GETVARIABLE(CBinit, spinC2Init)
     
     tmp->name = "Deltax";
     tmp->value = spinWidth->value()/spinNodes->value();
@@ -260,6 +278,14 @@ void Solver::loadVars()
         RESTOREVAR(NNodes, spinNodes)
         RESTOREVAR(Deltat, spinDt)
         RESTOREVAR(t_heat, spinTHeatRight)
+        RESTOREVAR(HConv, spinHRight)
+        RESTOREVAR(CAinit, spinC1Init)
+        RESTOREVAR(CBinit, spinC1Init)
+
+        if(strcmp(tmp->name, "R") == 0) {
+            puts("Success!");
+            R = tmp->value;
+        }
 
         tmp = tmp->next;
     }
@@ -380,7 +406,7 @@ void Solver::plotResultsTime(struct Node1D *n)
 {
     int i;
     int npts = n->NumValues;
-    double *t, *T, *c, *d;
+    double *t, *T, *c, *d, *a, tmp;
     char *title;
     title = (char*) calloc(20, sizeof(char));
     
@@ -395,6 +421,7 @@ void Solver::plotResultsTime(struct Node1D *n)
     Temp->detach();
     Prod->detach();
     Bact->detach();
+    alpha->detach();
 
     // Plot temperature data if the box for it is checked.
     if(checkTemp->isChecked()) {
@@ -438,6 +465,19 @@ void Solver::plotResultsTime(struct Node1D *n)
         Bact->setSamples(t, d, npts);
         free(d);
     }
+    
+    if(checkk->isChecked()) {
+        a = (double*) calloc(npts, sizeof(double));
+        for(i=0; i<npts; i++) {
+            tmp = n->Value[0][i];
+            a[i] = k(tmp)/(rho(tmp)*Cp(tmp));
+        }
+
+        alpha->attach(qwtPlot);
+
+        alpha->setSamples(t, a, npts);
+        free(a);
+    }
 
     sprintf(title, "x = %g", n->dx*n->NodeNum);
     qwtPlot->setTitle(title);
@@ -458,7 +498,7 @@ void Solver::plotResultsSpace(int t)
 {
     int i;
     int npts = domain->NumNodes;
-    double *x, *T, *c, *d;
+    double *x, *T, *c, *d, *a, tmp;
     char *title;
     title = (char*) calloc(20, sizeof(char));
     
@@ -473,6 +513,7 @@ void Solver::plotResultsSpace(int t)
     Temp->detach();
     Prod->detach();
     Bact->detach();
+    alpha->detach();
 
     // Plot temperature data if the box for it is checked.
     if(checkTemp->isChecked()) {
@@ -515,6 +556,20 @@ void Solver::plotResultsSpace(int t)
 
         Bact->setSamples(x, d, npts);
         free(d);
+    }
+    
+    if(checkk->isChecked()) {
+        a = (double*) calloc(npts, sizeof(double));
+        for(i=0; i<npts; i++) {
+            tmp = domain->Nodes[i]->Value[0][i];
+
+            a[i] = k(tmp)/(rho(tmp)*Cp(tmp));
+        }
+
+        alpha->attach(qwtPlot);
+
+        alpha->setSamples(x, a, npts);
+        free(a);
     }
 
     // Set the title.
