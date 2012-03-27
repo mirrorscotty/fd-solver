@@ -54,6 +54,11 @@ struct Node1D {
 
     /* Current time index. */
     int TimeIndex;
+
+    /* Same list of assorted variables that's specified in the parent domain
+     * structure. Not to be confused with variables that are being solved for
+     * by the FD simulation. */
+    struct var *varlst;
 };
 
 struct Domain1D {
@@ -74,6 +79,9 @@ struct Domain1D {
 
     /* An array of all the nodes in the domain. */
     struct Node1D **Nodes;
+
+    /* A list of random variables needed for the simulation */
+    struct var *varlst;
 };
 
 struct NodeStack {
@@ -107,6 +115,9 @@ double UpdateSubdomainRxn2(struct Node1D*, int);
 
 void CSVOutFixedNode(struct Node1D*, char*);
 void CSVOutFixedTime(struct Domain1D*, int, char*);
+
+void seth(double);
+void printh();
 
 #ifdef __cplusplus
 }

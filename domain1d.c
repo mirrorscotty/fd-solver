@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fd-solver.h"
+#include "datafile.h"
 
 struct Domain1D* CreateDomain1D(char *name,
         int width,
@@ -29,11 +30,17 @@ struct Domain1D* CreateDomain1D(char *name,
         domain->Nodes[i] = CreateNode1D(dx, dt, NumVars, times);
         domain->Nodes[i]->Prev = PrevNode;
         domain->Nodes[i]->NodeNum = i;
+        domain->Nodes[i]->varlst = domain->varlst;
         if(PrevNode)
             PrevNode->Next = domain->Nodes[i];
         PrevNode = domain->Nodes[i];
     }
     domain->NumTimes = times;
+
+    domain->varlst = new_var();
+    strcpy(domain->varlst->name, "Root");
+    domain->varlst->value = 2.71828183;
+
 
     return domain;
 }
@@ -49,6 +56,9 @@ void DestroyDomain1D(struct Domain1D *domain)
                 DestroyNode1D(domain->Nodes[i]);
             free(domain->Nodes);
         }
+
+        destroy_list(domain->varlst);
+
         free(domain);
     }
 }

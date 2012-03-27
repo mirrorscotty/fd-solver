@@ -7,6 +7,7 @@ QMAKEFEATURES += /usr/lib64/qt4/features6
 CONFIG += qwt
 LIBS += -lqwt6
 
+QMAKE_CXXFLAGS = -ggdb
 
 TEMPLATE = app
 TARGET = solver

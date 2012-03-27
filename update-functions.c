@@ -2,6 +2,22 @@
 #include "fd-solver.h"
 #include "can.h"
 
+double h = 0;
+
+// Yay for meeting deadlines!
+void seth(double x)
+{
+    h = x;
+    printh();
+    return;
+}
+
+void printh()
+{
+    printf("h = %g\n", h);
+    return;
+}
+
 double UpdateTest(struct Node1D *node, int Var)
 {
     int t = Var; // Get rid of the annoying warning about not using "Var"
@@ -94,7 +110,8 @@ double UpdateConvectiveBoundary(struct Node1D *node, int Var)
 {
     double T, Text, Ta, Tb;
     int t = node->TimeIndex;
-    double Cond, Dens, Cap, alpha, M, N, h;
+    double Cond, Dens, Cap, alpha, M, N;
+    //double h;
 
     Tb = node->Value[Var][t];
     Text = T_ext(t*node->dt);
@@ -105,7 +122,10 @@ double UpdateConvectiveBoundary(struct Node1D *node, int Var)
     else
         Ta = node->Next->Value[Var][t];
 
-    h = 3000; //W/(m^2 K)
+    //h = 3000; //W/(m^2 K)
+    //h = find_val("HConv", node->varlst);
+    printf("%g\n", h);
+
     Cond = k(Tb); //0.5985; // W/(m K)
     Dens = rho(Tb); //1000; // kg/m^3
     Cap = Cp(Tb); //1865; // J/(kg K)
@@ -174,7 +194,8 @@ double UpdateConvectiveBoundaryCyl(struct Node1D *node, int Var)
     double T, Text, Ta, Tb;
     int t = node->TimeIndex;
     int n = node->NodeNum;
-    double Cond, Dens, Cap, alpha, M, N, h;
+    double Cond, Dens, Cap, alpha, M, N;
+    //double h;
 
     Tb = node->Value[Var][t];
     Text = T_ext(t*node->dt);
@@ -185,7 +206,8 @@ double UpdateConvectiveBoundaryCyl(struct Node1D *node, int Var)
     else
         Ta = node->Next->Value[Var][t];
 
-    h = 3000; //W/(m^2 K)
+    //h = 3000; //W/(m^2 K)
+    //h = find_val("HConv", node->varlst);
     Cond = k(Tb); //0.5985; // W/(m K)
     Dens = rho(Tb); //1000; // kg/m^3
     Cap = Cp(Tb); //1865; // J/(kg K)

@@ -346,18 +346,23 @@ void Solver::solveProblems()
 
     storeVariables();
 
+    // Clean up stuff that was there before.
+    DestroyDomain1D(domain);
+    // Initialize the domain
+    setupDomain();
+
     // Save the data to the global variables used by the material property
     // funcitons. (Also bad.)
     tmp = datalist;
     while(tmp) {
         store_data(tmp);
+        if(strcmp(tmp->name, "HConv") == 0) {
+            //edit_var(domain->varlst, tmp);
+            seth(tmp->value);
+            printh();
+        }
         tmp = tmp->next;
     }
-
-    // Clean up stuff that was there before.
-    DestroyDomain1D(domain);
-    // Initialize the domain
-    setupDomain();
 
     // Solve
     while(UpdateDomain(domain) != 1)
