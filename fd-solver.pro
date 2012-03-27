@@ -5,7 +5,10 @@
 
 QMAKEFEATURES += /usr/lib64/qt4/features6
 CONFIG += qwt
-LIBS += -lqwt6
+linux:LIBS += -lqwt6
+linux:INCLUDEPATH += /usr/include/qwt6
+win32:LIBS += C:/Qwt-6.0.1/lib/qwt.dll
+win32:INCLUDEPATH += C:/Qwt-6.0.1/include
 
 QMAKE_CXXFLAGS = -ggdb
 
@@ -16,7 +19,6 @@ DEPENDPATH += . \
               gui \
               material-data/can
 INCLUDEPATH += . \
-               /usr/include/qwt6 \
                material-data/can \
                gui
 
